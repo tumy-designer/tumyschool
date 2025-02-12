@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+        }
+        label, input, select {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background: #002d59;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align:center;">User Registration</h2>
+
+    <form id="registrationForm">
+        <label>Full Name:</label>
+        <input type="text" name="fullname" id="fullname" required>
+
+        <label>Registration Number:</label>
+        <input type="text" name="reg_number" id="reg_number" placeholder="BCS-00-0000-0000" required>
+
+        <label>Sex:</label>
+        <select name="sex" id="sex" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
+        <label>Email:</label>
+        <input type="email" name="email" id="email" required>
+
+        <label>Region:</label>
+        <select name="region" id="region">
+            <option value="">Select Region</option>
+        </select>
+
+        <label>District:</label>
+        <select name="district" id="district">
+            <option value="">Select District</option>
+        </select>
+
+        <label>Password:</label>
+        <input type="password" name="password" id="password" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" name="confirm_password" id="confirm_password" required>
+
+        <input type="submit" value="Register">
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            // Validate Registration Number Format
+            $("#reg_number").on("input", function () {
+                var pattern = /^BCS-\d{2}-\d{4}-\d{4}$/;
+                if (!pattern.test($(this).val())) {
+                    alert("Invalid Registration Number Format! Use BCS-00-0000-0000");
+                    $(this).val("");
+                }
+            });
+
+            // Validate Password Match
+            $("#registrationForm").on("submit", function (e) {
+                if ($("#password").val() !== $("#confirm_password").val()) {
+                    alert("Passwords do not match!");
+                    e.preventDefault();
+                }
+            });
+
+            // Fetch regions dynamically
+            $.ajax({
+                url: "get_regions.php",
+                type: "GET",
+                success: function (data) {
+                    $("#region").append(data);
+                }
+            });
+
+            // Fetch districts based on selected region
+            $("#region").change(function () {
+                var regionID = $(this).val();
+                $.ajax({
+                    url: "get_districts.php",
+                    type: "GET",
+                    data: { region_id: regionID },
+                    success: function (data) {
+                        $("#district").html('<option value="">Select District</option>' + data);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
